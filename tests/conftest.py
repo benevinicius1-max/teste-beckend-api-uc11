@@ -59,3 +59,18 @@ def banco_limpo():
     criar_tabelas()
     yield
     Base.metadata.drop_all(bind=engine)
+
+@pytest.fixture
+def sessao() -> Session:
+    """Sessão de banco para os testes que precisam gravar direto.
+
+    O `rollback()` antes do `close()` desfaz qualquer transação que o teste
+    tenha deixado aberta. Sem ele, um teste que falha no meio de um `commit()`
+    deixaria a sessão em estado inconsistente para o próximo.
+    """
+    sessao = SessionLocal()
+    try:
+        yield sessao
+    finally:
+        sessao.rollback()
+        sessao.close()
