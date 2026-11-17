@@ -210,6 +210,9 @@ class Tarefa(Base):
         sobrescreve a data original. É esse caso que impede que editar o título
         de uma tarefa antiga falsifique a sua data de conclusão.
         """
+        if self._status is StatusTarefa.CONCLUIDA.value:
+            return
+
         self._status = StatusTarefa.CONCLUIDA.value
         self._concluido_em = agora or agora_utc()
 

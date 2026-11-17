@@ -545,3 +545,5 @@ emitido ou vazar.
   — como construir o projeto do zero em sete blocos de trabalho
 - **Documentação viva (OpenAPI):** `/docs` e `/redoc` com a aplicação em execução
 - **PTD da UC 12:** `ptd/PTD-UC12-Codificacao-Manutencao-Documentacao-Desktop.md`
+#   t e s t e - b a c k e n d  
+ 
