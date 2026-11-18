@@ -173,7 +173,18 @@ class Configuracao:
         database_url = os.getenv("DATABASE_URL", "").strip()
 
         if not database_url:
-            database_url = "sqlite:///./todo_list.db"
+            raise RuntimeError(
+                "A variável de ambiente DATABASE_URL não foi definida.\n"
+                f"Esperado um arquivo .env em: {CAMINHO_DO_ENV}\n"
+                "Ela é a URL de conexão com o banco de dados: sem ela, não há "
+                "como acessar os dados da aplicação.\n"
+                "Exemplo de valor para PostgreSQL:\n"
+                "    postgresql+psycopg://usuario:senha@host:5432/banco\n"
+                "Exemplo de valor para SQLite em arquivo local:\n"
+                "    sqlite:///./todo_list.db\n"
+                "Exemplo de valor para SQLite em memória (para testes):\n"
+                "    sqlite:///:memory:"
+            )
 
         segredo_jwt = os.getenv("JWT_SECRET", "").strip()
 
