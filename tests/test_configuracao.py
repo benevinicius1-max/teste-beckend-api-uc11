@@ -16,7 +16,10 @@ from app.config import (
     Configuracao,
     normalizar_url,
 )
- 
+
+#: Segredo com tamanho suficiente para passar pela validação de comprimento.
+#: Os testes que verificam outra coisa não deveriam falhar por causa dele.
+SEGREDO_LONGO = "segredo-de-teste-com-mais-de-trinta-e-dois-bytes"
 # =============================================================================
 # Dia 3 — `parametrize` numa função pura: a normalização da URL
 # =============================================================================
@@ -251,3 +254,42 @@ def test_tamanho_e_medido_em_bytes_nao_em_caracteres(monkeypatch):
     monkeypatch.setenv("JWT_SECRET", "ç" * 17)
 
     assert Configuracao.do_ambiente().segredo_jwt == "ç" * 17
+
+# =============================================================================
+# Dia 8 — a validade do token
+# =============================================================================
+
+def test_validade_padrao_do_token_e_de_sete_dias(monkeypatch):
+    monkeypatch.setenv("DATABASE_URL", "sqlite://")
+    monkeypatch.setenv("JWT_SECRET", SEGREDO_LONGO)
+    monkeypatch.delenv("JWT_EXPIRACAO_HORAS", raising=False)
+    assert Configuracao.do_ambiente().validade_do_token_em_horas == 168.0
+
+
+def test_validade_do_token_vem_do_ambiente(monkeypatch):
+    monkeypatch.setenv("DATABASE_URL", "sqlite://")
+    monkeypatch.setenv("JWT_SECRET", SEGREDO_LONGO)
+    monkeypatch.setenv("JWT_EXPIRACAO_HORAS", "0.5")
+    assert Configuracao.do_ambiente().validade_do_token_em_horas == 0.5
+
+
+@pytest.mark.parametrize("valor_invalido", ["meia hora", "-1", "0"])
+def test_validade_do_token_invalida_e_recusada(monkeypatch, valor_invalido):
+    """Um token que nasce expirado impediria qualquer login."""
+    monkeypatch.setenv("DATABASE_URL", "sqlite://")
+    monkeypatch.setenv("JWT_SECRET", SEGREDO_LONGO)
+    monkeypatch.setenv("JWT_EXPIRACAO_HORAS", valor_invalido)
+    with pytest.raises(RuntimeError, match="JWT_EXPIRACAO_HORAS"):
+        Configuracao.do_ambiente()
+
+
+def test_validade_vazia_conta_como_nao_declarada(monkeypatch):
+    """A string vazia **não** é erro: cai no padrão, como as outras opcionais.
+    Fica fora do parametrizado acima de propósito: o resultado esperado é
+    outro. Um `if` dentro de um teste parametrizado verificaria duas promessas
+    diferentes sob o mesmo nome — e esconderia qual das duas falhou.
+    """
+    monkeypatch.setenv("DATABASE_URL", "sqlite://")
+    monkeypatch.setenv("JWT_SECRET", SEGREDO_LONGO)
+    monkeypatch.setenv("JWT_EXPIRACAO_HORAS", "")
+    assert Configuracao.do_ambiente().validade_do_token_em_horas == 168.0
