@@ -27,3 +27,10 @@ psycopg[binary]
 # aplicação; uma dependência de desenvolvimento fica na máquina de quem
 # programa. Instalar a suíte de testes no servidor de produção é carregar
 # código que nunca vai rodar lá.
+# Medição de cobertura, acrescentada no Dia 9.
+#
+# Não entrou junto com as duas de cima de propósito: uma dependência nova é
+# uma decisão, e esta tem data e motivo. Declará-la aqui é o que faz a medição
+# ser reproduzível — quem clonar o projeto mede a mesma coisa, em vez de
+# depender do que estava instalado na máquina de quem rodou.
+pytest-cov

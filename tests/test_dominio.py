@@ -277,3 +277,10 @@ def test_repr_nao_expoe_o_hash_da_senha(hasher):
     usuario.definir_senha("senha123", hasher)
     assert "senha123" not in repr(usuario)
     assert usuario._senha_hash not in repr(usuario)
+
+def test_reabrir_tarefa_ja_pendente():
+    tarefa = Tarefa(usuario_id=1, titulo="Tarefa")
+    tarefa.reabrir()
+
+    assert tarefa.status == StatusTarefa.PENDENTE
+    assert tarefa.concluido_em is None

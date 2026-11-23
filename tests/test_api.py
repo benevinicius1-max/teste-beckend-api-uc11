@@ -373,4 +373,20 @@ def test_usuario_id_no_corpo_e_ignorado(
     )
     assert resposta.status_code == 201
     assert resposta.json()["usuarioId"] == usuario["id"]
+    
+def test_alterar_somente_a_prioridade(cliente_logado: TestClient):
+    criada = cliente_logado.post(
+        "/tasks", json={"titulo": "Tarefa", "prioridade": "baixa"}
+    ).json()
+
+    resposta = cliente_logado.patch(
+        f"/tasks/{criada['id']}", json={"prioridade": "urgente"}
+    )
+
+    assert resposta.status_code == 200
+    tarefa = resposta.json()
+    assert tarefa["prioridade"] == "urgente"
+    assert tarefa["titulo"] == criada["titulo"]
+    assert tarefa["status"] == criada["status"]
+    assert tarefa["prazo"] == criada["prazo"]
 
