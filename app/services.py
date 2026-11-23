@@ -156,7 +156,11 @@ class TarefaServico:
         tarefa = self._tarefas.buscar_por_id(tarefa_id)
         if tarefa is None:
             raise TarefaNaoEncontrada()
+        if not tarefa.pertence_a(usuario_id):
+          raise AcessoNaoAutorizado("Esta tarefa pertence a outro usuário.")
+        
         return tarefa
+    
 
     def atualizar(
         self, tarefa_id: int, alteracoes: AlteracoesDaTarefa, usuario_id: int
@@ -192,3 +196,4 @@ class TarefaServico:
             AcessoNaoAutorizado: se a tarefa pertencer a outro usuário.
         """
         self._tarefas.remover(self.buscar(tarefa_id, usuario_id))
+
